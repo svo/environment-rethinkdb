@@ -1,0 +1,36 @@
+    - name: Install RethinkDB apt key
+      apt_key: url=https://download.rethinkdb.com/apt/pubkey.gpg
+      sudo: yes
+      tags:
+      - rethinkdb
+      - run
+
+    - name: Add RethinkDB apt repository 
+      apt_repository: repo='deb http://download.rethinkdb.com/apt trusty main'
+      sudo: yes
+      tags:
+      - rethinkdb
+      - run
+
+    - name: Install RethinkDB
+      apt: pkg=rethinkdb update_cache=yes
+      sudo: yes
+      tags:
+      - rethinkdb
+      - run
+
+    - name: Copy default RethinkDB configuration file
+      copy: src=/etc/rethinkdb/default.conf.sample dest=/etc/rethinkdb/instances.d/instance.conf remote_src=yes
+      sudo: yes
+      tags:
+      - rethinkdb
+      - run
+
+    - name: Make RethinkDB available remotely
+      lineinfile: dest=/etc/rethinkdb/instances.d/instance.conf regexp="# bind=127.0.0.1" line="bind=all"
+      sudo: yes
+      notify:
+      - Restart RethinkDB
+      tags:
+      - rethinkdb
+      - run
